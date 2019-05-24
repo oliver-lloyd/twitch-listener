@@ -38,7 +38,7 @@ class twitch(socket.socket):
         self._join_channels(channels)
         
         while True: 
-            for channel in self.connected_channels:
+            for channel in self.channels:
                 if Utils.is_live(channel, self.client_id):
                     response = self._sockets[channel].recv(1024).decode("utf-8") 
                     if response == "PING :tmi.twitch.tv\r\n":
@@ -48,7 +48,7 @@ class twitch(socket.socket):
                     time.sleep(31/20)
                 else:
                     pass
-        for channel in self.connected_channels:
+        for channel in self.channels:
             self._sockets[channel].close()
                 
         
