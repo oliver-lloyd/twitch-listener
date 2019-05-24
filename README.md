@@ -17,8 +17,6 @@ __Example usage:__
 
 import TwitchListener
 
-bot = TwitchListener.twitch( 'botNameGoesHere', 'oauthTokenGoesHere', 'clientIDGoesHere' )
+bot = TwitchListener.twitch( nickname = 'botNameGoesHere', oauth = 'oauthTokenGoesHere', client_id = 'clientIDGoesHere' )
 
-bot.listen(['Ninja', 'Shroud', 'Northernlion'])
-
-#Note, as it currently stands, the program needs to be manually terminated. Will be fixed soon.
+bot.listen(streams = ['Ninja', 'Shroud', 'Northernlion'], duration = (integer, seconds) )
