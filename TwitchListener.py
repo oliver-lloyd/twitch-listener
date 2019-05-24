@@ -1,6 +1,6 @@
 from socket import socket
 import Utils
-from time import sleep, time
+from time import sleep, time, clock
 
 class twitch(socket):
     
@@ -43,8 +43,8 @@ class twitch(socket):
         startTime = time()
         
         # Collect data while duration not exceeded and channels are live
-        timeDiff = 0
-        while timeDiff < duration: 
+        clock()
+        while clock() < duration: 
             for channel in self.joined:
                 if Utils.is_live(channel, self.client_id):
                     response = self._sockets[channel].recv(1024).decode("utf-8") 
@@ -57,7 +57,8 @@ class twitch(socket):
                     sleep(31/20)
                 else:
                     pass
-                timeDiff = time()-startTime
+                print(str(clock()))
+
         print("Collected for " + str(time()-startTime) + " seconds")
 
         # Close sockets once not collecting date
