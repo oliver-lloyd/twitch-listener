@@ -1,8 +1,8 @@
-import socket
+from socket import socket
 import Utils
-import time
+from time import sleep, time
 
-class twitch(socket.socket):
+class twitch(socket):
     
     def __init__(self, nickname, oauth, client_id):
         self.nickname = nickname
@@ -17,39 +17,54 @@ class twitch(socket.socket):
         
 
     def _join_channels(self, channels):
-        # Establish connection
         self._sockets = {}
-        self.channels = channels
+        self.joined = []
         self._loggers = {}
         
+        # Establish socket connections
         for channel in channels:
-            self._sockets[channel] = socket.socket()
-            self._sockets[channel].connect((self._server, self._port))
-            self._sockets[channel].send(self._passString.encode('utf-8'))
-            self._sockets[channel].send(self._nameString.encode('utf-8'))
-            
-            joinString = f"JOIN #" + channel.lower() + f"\n"
-            self._sockets[channel].send(joinString.encode('utf-8'))
-            self._loggers[channel] = Utils.setup_loggers(channel, channel + '.log')
+            if Utils.is_live(channel, self.client_id):
+                self._sockets[channel] = socket()
+                self._sockets[channel].connect((self._server, self._port))
+                self._sockets[channel].send(self._passString.encode('utf-8'))
+                self._sockets[channel].send(self._nameString.encode('utf-8'))
+                
+                joinString = f"JOIN #" + channel.lower() + f"\n"
+                self._sockets[channel].send(joinString.encode('utf-8'))
+                self._loggers[channel] = Utils.setup_loggers(channel, channel + '.log')
+                
+                self.joined.append(channel)
+            else:
+                print(channel + " is not live right now.")
+        
         
     def listen(self, channels, duration = 0):
-        # Need to change while loop--- "while (currentTime - startTime) < duration"
-        
         self._join_channels(channels)
+        print('a')
+        startTime = time()
         
-        while True: 
-            for channel in self.channels:
+        # Collect data while duration not exceeded and channels are live
+        while (time()-startTime) < duration: 
+            for channel in self.joined:
                 if Utils.is_live(channel, self.client_id):
                     response = self._sockets[channel].recv(1024).decode("utf-8") 
+                    
                     if response == "PING :tmi.twitch.tv\r\n":
                         self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
                     else:
                         self._loggers[channel].info(response)
-                    time.sleep(31/20)
+                        
+                    sleep(31/20)
                 else:
                     pass
-        for channel in self.channels:
+        print("Collected for " + str(time()-startTime) + " seconds")
+        # Close sockets once not collecting data
+        for channel in self.joined:
             self._sockets[channel].close()
+        print('c')
+    def parse_logs(self):
+        # stuff will go here
+        pass
                 
         
             
