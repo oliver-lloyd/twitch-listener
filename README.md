@@ -1,4 +1,4 @@
-# twitch-listener
+# Twitch listener
 
 An easy to use Python bot for retrieving Twitch chat data from multiple streams simultaneously. 
 
