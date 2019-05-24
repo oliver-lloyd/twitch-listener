@@ -40,11 +40,11 @@ class twitch(socket):
         
     def listen(self, channels, duration = 0):
         self._join_channels(channels)
-        print('a')
         startTime = time()
         
         # Collect data while duration not exceeded and channels are live
-        while (time()-startTime) < duration: 
+        timeDiff = 0
+        while timeDiff < duration: 
             for channel in self.joined:
                 if Utils.is_live(channel, self.client_id):
                     response = self._sockets[channel].recv(1024).decode("utf-8") 
@@ -57,11 +57,13 @@ class twitch(socket):
                     sleep(31/20)
                 else:
                     pass
+                timeDiff = time()-startTime
         print("Collected for " + str(time()-startTime) + " seconds")
-        # Close sockets once not collecting data
+
+        # Close sockets once not collecting date
         for channel in self.joined:
             self._sockets[channel].close()
-        print('c')
+
     def parse_logs(self):
         # stuff will go here
         pass
