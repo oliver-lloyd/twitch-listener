@@ -38,28 +38,31 @@ class twitch(socket):
                 print(channel + " is not live right now.")
         
         
-    def listen(self, channels, duration = 0):
+    def listen(self, channels, duration = 0, timer = False):
         self._join_channels(channels)
-        startTime = time()
+
+        if timer:
+            startTime = time()
         
         # Collect data while duration not exceeded and channels are live
         clock()
         while clock() < duration: 
+            
             for channel in self.joined:
                 if Utils.is_live(channel, self.client_id):
-                    response = self._sockets[channel].recv(1024).decode("utf-8") 
+                    response = self._sockets[channel].recv(1024)
                     
                     if response == "PING :tmi.twitch.tv\r\n":
                         self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
                     else:
                         self._loggers[channel].info(response)
                         
-                    sleep(31/20)
-                else:
+                    sleep(60/800) 
+                    
+                else: # If not utils.is_live()
                     pass
-                print(str(clock()))
-
-        print("Collected for " + str(time()-startTime) + " seconds")
+        if timer:
+            print("Collected for " + str(time()-startTime) + " seconds")
 
         # Close sockets once not collecting date
         for channel in self.joined:
