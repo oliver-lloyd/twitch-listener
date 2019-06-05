@@ -17,6 +17,11 @@ __Example usage:__
 
 import TwitchListener
 
-bot = TwitchListener.twitch( nickname = 'botNameGoesHere', oauth = 'oauthTokenGoesHere', client_id = 'clientIDGoesHere' )
+# Set up twitch connection
+bot = TwitchListener.twitch( nickname = 'yourUsernameHere', oauth = 'yourOauthTokenGoesHere', client_id = 'yourClientIDGoesHere' )
 
-bot.listen(streams = ['Ninja', 'Shroud', 'Northernlion'], duration = (integer, seconds) )
+# Scrape chat data. Channels = list/string, duration = int (number of seconds to listen for)
+bot.listen(channels = ['Ninja', 'Shroud', 'Northernlion'], duration = 10 )
+
+# Convert the raw log files into CSV format. (work in progress)
+bot.parse_logs()
