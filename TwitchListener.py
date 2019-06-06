@@ -76,42 +76,69 @@ class twitch(socket):
         # Close sockets once not collecting date
         for channel in self.joined:
             self._sockets[channel].close()
+     
+        
+    def _split_line(self, line, firstLine = False):
+        prefix = line[:28]
+        
+        if firstLine:
+            line = line.split('End of /NAMES list\\r\\n')[1]
             
+        splits = [message for message in line.split('\\r\\n') if 'PRIVMSG' in message]
+        
+        for i, case in enumerate(splits):
+            if firstLine or i != 0:
+                splits[i] = prefix + splits[i]
+                
+        return splits
 
     def parse_logs(self, timestamp = False, channels = None):
 
         if channels == None:
             channels = self.joined
-        
+
         for channel in channels:
             
             filename = channel + ".log"
             
+            lines = []
             with open(filename) as f:
-                raw_text = f.read()
-                
-            drop_garbage = raw_text.split('End of /NAMES list')[-1]
-            
-            raw_messages = drop_garbage[10:]
-                
-            lines = raw_messages.split('\\r\\n')[:-1]
-            
-            #lines = []
-            
-            # Drop duplicate observations
+                for line in f:
+                    if line not in lines:
+                        lines.append(line)
+                        
+            # Separate the raw strings into separate messages 
             split_messages = []
             for line in lines:
-                if line not in split_messages:
-                    split_messages.append(line)
+                count = line.count('.tmi.twitch.tv PRIVMSG #')
+                                   
+                if 'Your host is tmi.twitch.tv' in line:
+                    if 'PRIVMSG' in line:
+                        for msg in self._split_line(line, firstLine = True):
+                            split_messages.append(msg)
+                    else:      
+                        pass
+                                
+                elif count == 0:
+                    pass
                     
-                
-                
-            data = []
+                elif count == 1:
+                    if line.endswith('\\r\\n\'\n'):
+                        split_messages.append(line[:-6])
+                    else:
+                        split_messages.append(line)
+                        
+                else:
+                    for msg in self._split_line(line):
+                        split_messages.append(msg)
             
+            # Parse username, message text and (optional) datetime
+            data = []          
             for ind, message in enumerate(split_messages):
                 username = None
-                datetime = None
                 message_text = None
+                datetime = None
+                
                 row = {}
                 
                 # Parse message text
@@ -121,38 +148,23 @@ class twitch(socket):
                 message_text = slice_[slice_point:]
                 row['text'] = message_text
                 
-                case_check = message.find("20") # Normal messages should have datetime at the beginning (note, this will break in the year 2100 lol)
+                # Parse username
+                b = message.find("b")
+                exclam = message.find("!")
+                username = message[b:exclam][3:]
+                row['username'] = username
                 
-                
-                if -1 < case_check < 5: # case when: normal messages
-                    
-                    # Parse username
-                    b = message.find("b")
-                    exclam = message.find("!")
-                    username = message[b:exclam][3:]
-                    row['username'] = username
-                    
-                    # Parse timestamp
-                    if timestamp:
-                        datetime = message[case_check: case_check + 18] # Dates are in weirdo American format
-                        row['timestamp'] = datetime
-                    
-                elif message.startswith(":"): # case when: messages are sent at the exact same timestamp (usually bots)
-                    
-                    # Parse username
-                    exclam = message.find("!")
-                    username = message[1:exclam]
-                    row['username'] = username
-                    
-                     # Parse timestamp
-                    if timestamp:
-                        datetime = data[ind-1]['timestamp']
-                        row['timestamp'] = datetime
-                
-                data.append(row)
-                
-            pd.DataFrame(data).to_csv(channel + ".csv", index = False)
-                    
+                # Parse timestamp
+                if timestamp:
+                    datetime = message[:23] # Dates are in weirdo American format
+                    row['timestamp'] = datetime
             
-                
-    
+                # Storse data
+                data.append(row)
+            
+            # Write data to file
+            pd.DataFrame(data).to_csv(channel + ".csv", index = False)
+                                        
+                                
+                                    
+                        
