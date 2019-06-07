@@ -43,14 +43,17 @@ class twitch(socket):
                 print(channel + " is not live right now.")
         
         
-    def listen(self, channels, duration = 0, timer = False):
+    def listen(self, channels, duration = 0, timer = True):
         """
         Method for scraping chat data from Twitch channels.
 
         Parameters:
-            channels (string or list) - Channel(s) to connect to.
-            duration (int)            - Length of time to listen for.
-            timer (bool)              - Debugging feature, will likely be removed in later version. 
+            channels (string or list) 
+                - Channel(s) to connect to.
+            duration (int)           
+                 - Length of time to listen for.
+            timer (bool)             
+                 - Debugging feature, will likely be removed in later version. 
         """
 
         if type(channels) is str:
@@ -90,7 +93,8 @@ class twitch(socket):
         if firstLine:
             line = line.split('End of /NAMES list\\r\\n')[1]
             
-        splits = [message for message in line.split('\\r\\n') if 'PRIVMSG' in message]
+        splits = [message for message in line.split('\\r\\n') 
+            if 'PRIVMSG' in message]
         
         for i, case in enumerate(splits):
             if firstLine or i != 0:
@@ -103,10 +107,15 @@ class twitch(socket):
         Method for converting raw data from text logs into .CSV format.
 
         Parameters:
-            timestamp (boolean, optional) - Whether or not to include the timestamp of chat messages. 
-                                            (Note: timestamps represent when message was retrieved, not sent)
-            channels (list, optional)     - List of channel usernames for whom the text logs will be parsed into csv format.
-                                            If none are specified, the channels that are currently joined will be parsed
+            timestamp (boolean, optional) 
+                - Whether or not to include the timestamp of chat messages. 
+                - Note: timestamps represent when message 
+                    was retrieved, not sent
+            channels (list, optional)     
+                - List of channel usernames for whom the text logs 
+                    will be parsed into csv format.
+                - If none are specified, the channels that are 
+                    currently joined will be parsed
         """
 
         # Check if specific list of channels is given
@@ -114,7 +123,8 @@ class twitch(socket):
             try:
                 channels = self.joined
             except:
-                print("Please either connect to channels, or specify a list of log files to parse.")
+                print("Please either connect to channels, \
+                or specify a list of log files to parse.")
         for channel in channels:
             filename = channel + ".log"
             lines = []
@@ -130,7 +140,8 @@ class twitch(socket):
                                    
                 if 'Your host is tmi.twitch.tv' in line:
                     if 'PRIVMSG' in line:
-                        for msg in self._split_line(line, firstLine = True):
+                        msgs = self._split_line(line, firstLine = True)
+                        for msg in msgs:
                             split_messages.append(msg)
                     else:      
                         pass
@@ -170,7 +181,8 @@ class twitch(socket):
                 username = message[b:exclam][3:]
                 row['username'] = username
                 
-                # Parse timestamp (note: dates are in weirdo American format)
+                # Parse timestamp 
+                # (note: dates are in weirdo American format)
                 if timestamp:
                     datetime = message[:23] 
                     row['timestamp'] = datetime
