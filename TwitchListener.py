@@ -1,6 +1,6 @@
 from socket import socket
 from time import time, sleep
-import Utils
+import utils
 import pandas as pd
 
 class twitch(socket):
@@ -28,7 +28,7 @@ class twitch(socket):
         
         # Establish socket connections
         for channel in channels:
-            if Utils.is_live(channel, self.client_id):
+            if utils.is_live(channel, self.client_id):
                 self._sockets[channel] = socket()
                 self._sockets[channel].connect((self._server, self._port))
                 self._sockets[channel].send(self._passString.encode('utf-8'))
@@ -36,7 +36,7 @@ class twitch(socket):
                 
                 joinString = f"JOIN #" + channel.lower() + f"\n"
                 self._sockets[channel].send(joinString.encode('utf-8'))
-                self._loggers[channel] = Utils.setup_loggers(channel, channel + '.log')
+                self._loggers[channel] = utils.setup_loggers(channel, channel + '.log')
                 
                 self.joined.append(channel)
             else:
@@ -64,7 +64,7 @@ class twitch(socket):
         while (time() - startTime) < duration: 
             
             for channel in self.joined:
-                if Utils.is_live(channel, self.client_id):
+                if utils.is_live(channel, self.client_id):
                     response = self._sockets[channel].recv(1024)
                     
                     if response == "PING :tmi.twitch.tv\r\n":
