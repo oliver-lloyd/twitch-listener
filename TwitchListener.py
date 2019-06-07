@@ -44,13 +44,14 @@ class twitch(socket):
         
         
     def listen(self, channels, duration = 0, timer = False):
-        
+        """
+        docstring goes here 
+        """
+
         if type(channels) is str:
             channels = [channels]
             
         self._join_channels(channels)
-        
-        
         
         startTime = time()
         
@@ -93,7 +94,9 @@ class twitch(socket):
         return splits
 
     def parse_logs(self, timestamp = False, channels = None):
-
+        """
+        docstriiing
+        """
         if channels == None:
             channels = self.joined
 
