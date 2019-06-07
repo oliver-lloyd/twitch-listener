@@ -20,8 +20,8 @@ import TwitchListener
 # Set up twitch connection
 bot = TwitchListener.twitch( nickname = 'yourUsernameHere', oauth = 'yourOauthTokenGoesHere', client_id = 'yourClientIDGoesHere' )
 
-# Scrape chat data. Channels = list/string, duration = int (number of seconds to listen for)
-bot.listen(channels = ['Ninja', 'Shroud', 'Northernlion'], duration = 10 )
+# Scrape chat data. 
+bot.listen(channels = ['Northernlion', 'Ninja'], duration = 10 )
 
-# Convert the raw log files into CSV format. (work in progress)
+# Convert the text log files to csv
 bot.parse_logs()
