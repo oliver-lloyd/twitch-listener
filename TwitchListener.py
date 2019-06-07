@@ -45,7 +45,12 @@ class twitch(socket):
         
     def listen(self, channels, duration = 0, timer = False):
         """
-        docstring goes here 
+        Method for scraping chat data from Twitch channels.
+
+        Parameters:
+            channels (string or list) - Channel(s) to connect to.
+            duration (int)            - Length of time to listen for.
+            timer (bool)              - Debugging feature, will likely be removed in later version. 
         """
 
         if type(channels) is str:
@@ -93,17 +98,25 @@ class twitch(socket):
                 
         return splits
 
-    def parse_logs(self, timestamp = False, channels = None):
+    def parse_logs(self, timestamp = True, channels = []):
         """
-        docstriiing
-        """
-        if channels == None:
-            channels = self.joined
+        Method for converting raw data from text logs into .CSV format.
 
+        Parameters:
+            timestamp (boolean, optional) - Whether or not to include the timestamp of chat messages. 
+                                            (Note: timestamps represent when message was retrieved, not sent)
+            channels (list, optional)     - List of channel usernames for whom the text logs will be parsed into csv format.
+                                            If none are specified, the channels that are currently joined will be parsed
+        """
+
+        # Check if specific list of channels is given
+        if len(channels) == 0:
+            try:
+                channels = self.joined
+            except:
+                print("Please either connect to channels, or specify a list of log files to parse.")
         for channel in channels:
-            
             filename = channel + ".log"
-            
             lines = []
             with open(filename) as f:
                 for line in f:
@@ -157,12 +170,12 @@ class twitch(socket):
                 username = message[b:exclam][3:]
                 row['username'] = username
                 
-                # Parse timestamp
+                # Parse timestamp (note: dates are in weirdo American format)
                 if timestamp:
-                    datetime = message[:23] # Dates are in weirdo American format
+                    datetime = message[:23] 
                     row['timestamp'] = datetime
             
-                # Storse data
+                # Store observations
                 data.append(row)
             
             # Write data to file
