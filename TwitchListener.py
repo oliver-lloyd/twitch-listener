@@ -3,9 +3,12 @@ from time import time, sleep
 import utils
 import pandas as pd
 
+
 class twitch(socket):
-    
+     
+
     def __init__(self, nickname, oauth, client_id):
+
         self.nickname = nickname
         
         self.client_id = client_id
@@ -22,6 +25,7 @@ class twitch(socket):
         
 
     def _join_channels(self, channels):
+
         self._sockets = {}
         self.joined = []
         self._loggers = {}
@@ -44,6 +48,7 @@ class twitch(socket):
         
         
     def listen(self, channels, duration = 0, timer = True):
+
         """
         Method for scraping chat data from Twitch channels.
 
@@ -58,9 +63,7 @@ class twitch(socket):
 
         if type(channels) is str:
             channels = [channels]
-            
         self._join_channels(channels)
-        
         startTime = time()
         
         # Collect data while duration not exceeded and channels are live
@@ -68,41 +71,35 @@ class twitch(socket):
             
             for channel in self.joined:
                 if utils.is_live(channel, self.client_id):
-                    response = self._sockets[channel].recv(1024)
-                    
+                    response = self._sockets[channel].recv(4096)
                     if response == "PING :tmi.twitch.tv\r\n":
                         self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
                     else:
                         self._loggers[channel].info(response)
-                        
                     sleep(60/800) 
-                    
                 else: # If not utils.is_live()
                     pass
         if timer:
             print("Collected for " + str(time()-startTime) + " seconds")
-
-        # Close sockets once not collecting date
+            
+        # Close sockets once not collecting data
         for channel in self.joined:
             self._sockets[channel].close()
-     
-        
+             
     def _split_line(self, line, firstLine = False):
-        prefix = line[:28]
         
+        prefix = line[:28]        
         if firstLine:
-            line = line.split('End of /NAMES list\\r\\n')[1]
-            
-        splits = [message for message in line.split('\\r\\n') 
-            if 'PRIVMSG' in message]
-        
+            line = line.split('End of /NAMES list\\r\\n')[1]        
+        splits = [message for ind, message in enumerate(line.split("\\r\\n")) if 'PRIVMSG' in message or ind == 0] 
         for i, case in enumerate(splits):
             if firstLine or i != 0:
                 splits[i] = prefix + splits[i]
-                
+            
         return splits
 
     def parse_logs(self, timestamp = True, channels = []):
+
         """
         Method for converting raw data from text logs into .CSV format.
 
@@ -124,7 +121,8 @@ class twitch(socket):
                 channels = self.joined
             except:
                 print("Please either connect to channels, \
-                or specify a list of log files to parse.")
+                      or specify a list of log files to parse.")
+
         for channel in channels:
             filename = channel + ".log"
             lines = []
@@ -144,17 +142,14 @@ class twitch(socket):
                         for msg in msgs:
                             split_messages.append(msg)
                     else:      
-                        pass
-                                
+                        pass               
                 elif count == 0:
                     pass
-                    
                 elif count == 1:
                     if line.endswith('\\r\\n\'\n'):
                         split_messages.append(line[:-6])
                     else:
-                        split_messages.append(line)
-                        
+                        split_messages.append(line)     
                 else:
                     for msg in self._split_line(line):
                         split_messages.append(msg)
@@ -165,7 +160,6 @@ class twitch(socket):
                 username = None
                 message_text = None
                 datetime = None
-                
                 row = {}
                 
                 # Parse message text
