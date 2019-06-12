@@ -21,5 +21,5 @@ def is_live(streamer_name, client_id):
     streamer_html = requests.get(twitch_api_stream_url)
 
     streamer = json.loads(streamer_html.content)
-
+    
     return streamer["stream"] is not None

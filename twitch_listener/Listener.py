@@ -31,20 +31,16 @@ class connect_twitch(socket):
         
         # Establish socket connections
         for channel in channels:
-            if utils.is_live(channel, self.client_id):
-                self._sockets[channel] = socket()
-                self._sockets[channel].connect((self._server, self._port))
-                self._sockets[channel].send(self._passString.encode('utf-8'))
-                self._sockets[channel].send(self._nameString.encode('utf-8'))
-                
-                joinString = f"JOIN #" + channel.lower() + f"\n"
-                self._sockets[channel].send(joinString.encode('utf-8'))
-                self._loggers[channel] = utils.setup_loggers(channel, channel + '.log')
-                
-                self.joined.append(channel)
-            else:
-                print(channel + " is not live right now.")
-        
+            self._sockets[channel] = socket()
+            self._sockets[channel].connect((self._server, self._port))
+            self._sockets[channel].send(self._passString.encode('utf-8'))
+            self._sockets[channel].send(self._nameString.encode('utf-8'))
+            
+            joinString = f"JOIN #" + channel.lower() + f"\n"
+            self._sockets[channel].send(joinString.encode('utf-8'))
+            self._loggers[channel] = utils.setup_loggers(channel, channel + '.log')
+            
+            self.joined.append(channel)
         
     def listen(self, channels, duration = 0, debug = False):
 
@@ -68,27 +64,23 @@ class connect_twitch(socket):
         # Collect data while duration not exceeded and channels are live
         while (time() - startTime) < duration: 
             now = time() # Track loop time for adaptive rate limiting
-            offline = [] # Track channels that go offline to repeated utils.is_live
             
             for channel in self.joined:
-                if channel not in offline:
-                    if utils.is_live(channel, self.client_id):
-                        response = self._sockets[channel].recv(16384)
-                        if b"PING :tmi.twitch.tv\r\n" in response:
-                            self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
-                            if debug:
-                                print("\n\n!!Look, a ping: \n")
-                                print(response)
-                                print("\n\n")
-                        else:
-                            self._loggers[channel].info(response)
-                            if debug:
-                                print(response)
-                        elapsed = time() - now
-                        if elapsed < 60/800:
-                            sleep( (60/800) - elapsed) # Rate limit
-                    else: # If not utils.is_live()
-                        offline.append(channel)
+                response = self._sockets[channel].recv(16384)
+                if b"PING :tmi.twitch.tv\r\n" in response:
+                    self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+                    if debug:
+                        print("\n\n!!Look, a ping: \n")
+                        print(response)
+                        print("\n\n")
+                else:
+                    self._loggers[channel].info(response)
+                    if debug:
+                        print(response)
+                elapsed = time() - now
+                if elapsed < 60/800:
+                    sleep( (60/800) - elapsed) # Rate limit
+                    
         if debug:
             print("Collected for " + str(time()-startTime) + " seconds")
             
@@ -146,17 +138,13 @@ class connect_twitch(socket):
             split_messages = []
             for line in lines:
                 count = line.count('.tmi.twitch.tv PRIVMSG #')
-                                   
-                if 'Your host is tmi.twitch.tv' in line:
-                    if 'PRIVMSG' in line:
-                        msgs = self._split_line(line, firstLine = True)
-                        for msg in msgs:
-                            split_messages.append(msg)
-                    else:      
-                        pass               
+                entryInfo = 'Your host is tmi.twitch.tv' in line or 'End of /NAMES list\\r\\n' in line
+                if entryInfo:
+                    pass
+                
                 elif count == 0:
                     pass
-                elif count == 1:
+                elif count == 1 and not entryInfo:
                     if line.endswith('\\r\\n\'\n'):
                         split_messages.append(line[:-6])
                     else:
@@ -176,6 +164,7 @@ class connect_twitch(socket):
                 # Parse message text
                 hash_channel_point = message.find("PRIVMSG #" + channel)
                 slice_ = message[hash_channel_point:]
+                
                 slice_point = slice_.find(":") + 1
                 message_text = slice_[slice_point:]
                 row['text'] = message_text
@@ -197,7 +186,4 @@ class connect_twitch(socket):
             
             # Write data to file
             pd.DataFrame(data).to_csv(channel + ".csv", index = False)
-                                        
-                                
-                                    
                         
