@@ -1,7 +1,8 @@
 # Twitch listener bot
 
 An easy to use Python bot for retrieving Twitch chat data from multiple streams simultaneously. 
-Installation:
+
+# Installation:
 ```
 pip install twitch-listener
 ```
@@ -17,7 +18,7 @@ Steps for acquiring credentials:
 
 Store these values securely. You now have everything you need to use TwitchListener.
 
-Example usage:
+# Example usage:
 
 ```python
 from twitch_listener import Listener
