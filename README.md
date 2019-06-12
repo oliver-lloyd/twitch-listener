@@ -21,10 +21,10 @@ Example usage:
 
 ```python
 
-import TwitchListener
+from TwitchListener import Listener
 
 # Connect to Twitch
-bot = TwitchListener.twitch('yourUsernameHere', 
+bot = Listener.connect_twitch('yourUsernameHere', 
                              'yourOauthHere', 
                              'yourClientIDHere')
 
