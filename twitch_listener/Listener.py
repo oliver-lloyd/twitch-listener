@@ -46,7 +46,7 @@ class connect_twitch(socket):
                 print(channel + " is not live right now.")
         
         
-    def listen(self, channels, duration = 0, debug = True):
+    def listen(self, channels, duration = 0, debug = False):
 
         """
         Method for scraping chat data from Twitch channels.

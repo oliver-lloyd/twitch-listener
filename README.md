@@ -20,8 +20,7 @@ Store these values securely. You now have everything you need to use TwitchListe
 Example usage:
 
 ```python
-
-from TwitchListener import Listener
+from twitch_listener import Listener
 
 # Connect to Twitch
 bot = Listener.connect_twitch('yourUsernameHere', 
