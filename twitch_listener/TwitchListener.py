@@ -1,6 +1,7 @@
 import pandas as pd
 from socket import socket
 from time import time, sleep
+from twitch_listener import utils
 
 class twitch(socket):
      
