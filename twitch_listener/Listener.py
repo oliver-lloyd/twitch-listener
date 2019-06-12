@@ -3,7 +3,7 @@ from socket import socket
 from time import time, sleep
 from twitch_listener import utils
 
-class twitch(socket):
+class connect_twitch(socket):
      
 
     def __init__(self, nickname, oauth, client_id):
