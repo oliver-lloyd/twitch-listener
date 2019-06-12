@@ -2,26 +2,36 @@
 
 An easy to use Python bot for retrieving Twitch chat data from multiple streams simultaneously. 
 
+Steps for acquiring credentials:
+1) Get a twitch.tv account 
+	- get one here https://www.twitch.tv/signup
+2) Obtain a Twitch client id
+	- Get yours by registering an app here https://dev.twitch.tv/console/apps/create
+	- (You can set 'OAuth Redirect URL' to 'http://localhost')
+3) Acquire a Twitch OAuth token
+	- Get yours here https://twitchapps.com/tmi/
 
-__Current functionality__:
-- Connect and log the chat data from multiple Twitch streams 
-- Logging of chat data terminated if the channel goes offline
+Store these values securely. You now have everything you need to use TwitchListener.
 
+Example usage:
 
-__Planned functionality__:
-- Parsing the stored logs into usable formats (.CSV etc)
-- Specify duration of data collection
-
-
-__Example usage:__
+```python
 
 import TwitchListener
 
-# Set up twitch connection
-bot = TwitchListener.twitch( nickname = 'yourUsernameHere', oauth = 'yourOauthTokenGoesHere', client_id = 'yourClientIDGoesHere' )
+# Connect to Twitch
+bot = TwitchListener.twitch('yourUsernameHere', 
+                             'yourOauthHere', 
+                             'yourClientIDHere')
 
-# Scrape chat data. 
-bot.listen(channels = ['Northernlion', 'Ninja'], duration = 10 )
+# List of channels to connect to
+channels_to_listen_to = ['Northernlion', 'DumbDog', 'DanGheesling']
 
-# Convert the text log files to csv
-bot.parse_logs()
+# Scrape chat data into raw log files. (Duration is seconds)
+bot.listen(channels_to_listen_to, duration = 1800) 
+
+# Convert log files into .CSV format
+bot.parse_logs(timestamp = True)
+```
+
+
