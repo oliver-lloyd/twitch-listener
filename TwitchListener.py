@@ -47,7 +47,7 @@ class twitch(socket):
                 print(channel + " is not live right now.")
         
         
-    def listen(self, channels, duration = 0, timer = True):
+    def listen(self, channels, duration = 0, debug = True):
 
         """
         Method for scraping chat data from Twitch channels.
@@ -57,7 +57,7 @@ class twitch(socket):
                 - Channel(s) to connect to.
             duration (int)           
                  - Length of time to listen for.
-            timer (bool)             
+            debug (bool)             
                  - Debugging feature, will likely be removed in later version. 
         """
 
@@ -68,18 +68,29 @@ class twitch(socket):
         
         # Collect data while duration not exceeded and channels are live
         while (time() - startTime) < duration: 
+            now = time() # Track loop time for adaptive rate limiting
+            offline = [] # Track channels that go offline to repeated utils.is_live
             
             for channel in self.joined:
-                if utils.is_live(channel, self.client_id):
-                    response = self._sockets[channel].recv(4096)
-                    if response == "PING :tmi.twitch.tv\r\n":
-                        self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
-                    else:
-                        self._loggers[channel].info(response)
-                    sleep(60/800) 
-                else: # If not utils.is_live()
-                    pass
-        if timer:
+                if channel not in offline:
+                    if utils.is_live(channel, self.client_id):
+                        response = self._sockets[channel].recv(16384)
+                        if b"PING :tmi.twitch.tv\r\n" in response:
+                            self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+                            if debug:
+                                print("\n\n!!Look, a ping: \n")
+                                print(response)
+                                print("\n\n")
+                        else:
+                            self._loggers[channel].info(response)
+                            if debug:
+                                print(response)
+                        elapsed = time() - now
+                        if elapsed < 60/800:
+                            sleep( (60/800) - elapsed) # Rate limit
+                    else: # If not utils.is_live()
+                        offline.append(channel)
+        if debug:
             print("Collected for " + str(time()-startTime) + " seconds")
             
         # Close sockets once not collecting data
@@ -91,7 +102,8 @@ class twitch(socket):
         prefix = line[:28]        
         if firstLine:
             line = line.split('End of /NAMES list\\r\\n')[1]        
-        splits = [message for ind, message in enumerate(line.split("\\r\\n")) if 'PRIVMSG' in message or ind == 0] 
+        splits = [message for ind, message in enumerate(line.split("\\r\\n")) 
+                  if 'PRIVMSG' in message or ind == 0] 
         for i, case in enumerate(splits):
             if firstLine or i != 0:
                 splits[i] = prefix + splits[i]
