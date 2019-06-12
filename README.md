@@ -7,7 +7,8 @@ An easy to use Python bot for retrieving Twitch chat data from multiple streams 
 pip install twitch-listener
 ```
 
-Steps for acquiring credentials:
+
+# Steps for acquiring Twitch credentials (skip if you already have these):
 1) Get a twitch.tv account 
 	- get one here https://www.twitch.tv/signup
 2) Obtain a Twitch client id
