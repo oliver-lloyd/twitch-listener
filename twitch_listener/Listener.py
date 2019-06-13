@@ -2,6 +2,7 @@ import pandas as pd
 from socket import socket
 from time import time, sleep
 from twitch_listener import utils
+import select
 
 class connect_twitch(socket):
      
@@ -64,23 +65,27 @@ class connect_twitch(socket):
         # Collect data while duration not exceeded and channels are live
         while (time() - startTime) < duration: 
             now = time() # Track loop time for adaptive rate limiting
+            ready_socks,_,_ = select.select(self._sockets.values(), [], [], 1)
             
             for channel in self.joined:
-                response = self._sockets[channel].recv(16384)
-                if b"PING :tmi.twitch.tv\r\n" in response:
-                    self._sockets[channel].send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
-                    if debug:
-                        print("\n\n!!Look, a ping: \n")
-                        print(response)
-                        print("\n\n")
-                else:
-                    self._loggers[channel].info(response)
-                    if debug:
-                        print(response)
-                elapsed = time() - now
-                if elapsed < 60/800:
-                    sleep( (60/800) - elapsed) # Rate limit
-                    
+                sock = self._sockets[channel]
+                if sock in ready_socks:
+                    response = sock.recv(16384)
+                    if b"PING :tmi.twitch.tv\r\n" in response:
+                        sock.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+                        if debug:
+                            print("\n\n!!Look, a ping: \n")
+                            print(response)
+                            print("\n\n")
+                    else:
+                        self._loggers[channel].info(response)
+                        if debug:
+                            print(response)
+                    elapsed = time() - now
+                    if elapsed < 60/800:
+                        sleep( (60/800) - elapsed) # Rate limit
+                else: # if not in ready socks
+                    pass
         if debug:
             print("Collected for " + str(time()-startTime) + " seconds")
             
@@ -185,5 +190,6 @@ class connect_twitch(socket):
                 data.append(row)
             
             # Write data to file
-            pd.DataFrame(data).to_csv(channel + ".csv", index = False)
+            if len(data) > 0:
+                pd.DataFrame(data).to_csv(channel + ".csv", index = False)
                         
