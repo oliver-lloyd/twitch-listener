@@ -1,6 +1,6 @@
 # Twitch listener bot
 
-An easy to use Python bot for retrieving Twitch chat data from multiple streams simultaneously. 
+An easy to use Python bot for retrieving Twitch chat data from multiple streams simultaneously. Also features the ability to generate association matrices between the streams being scraped. 
 
 # Installation:
 ```
@@ -37,6 +37,9 @@ bot.listen(channels_to_listen_to, duration = 1800)
 
 # Convert log files into .CSV format
 bot.parse_logs(timestamp = True)
+
+# Generate association matrix
+bot.assoc_matrix(weighted = False, matrix_name = "streamer_network.csv")
 ```
 
 
