@@ -106,7 +106,7 @@ class connect_twitch(socket):
             
         return splits
 
-    def parse_logs(self, timestamp = True, channels = []):
+    def parse_logs(self, channels = [], timestamp = True):
 
         """
         Method for converting raw data from text logs into .CSV format.
@@ -132,7 +132,8 @@ class connect_twitch(socket):
                       or specify a list of log files to parse.")
 
         for channel in channels:
-            filename = channel + ".log"
+            if not filename.endswith(".log"):
+                filename = channel + ".log"
             lines = []
             with open(filename) as f:
                 for line in f:
@@ -193,3 +194,58 @@ class connect_twitch(socket):
             if len(data) > 0:
                 pd.DataFrame(data).to_csv(channel + ".csv", index = False)
                         
+    def assoc_matrix(self, channels = [], weighted = True, matrix_name = None):
+        """
+        Generates an association matrix between streamers, where a tie indicates
+        that one (or more) users commented in the chats of both streamers.
+        
+        Parameters:
+            channels (list, optional)
+                - Indicate a list of channels to create a matrix for. If no 
+                value is given, currently joined channels will be used.
+            weighted (boolean, optional)
+                - Indicate whether ties should be weighted by the number of 
+                common users, or simply be binary.
+            filename (string, optional)
+                - Name to give the association matrix .CSV file
+        """
+        
+        # Check if specific list of channels is given
+        if len(channels) == 0:
+            try:
+                channels = self.joined
+            except:
+                print("Please either connect to channels, \
+                      or specify a list of csv files to analyse.")
+        users = {}
+        for channel in channels:
+            if not channel.endswith(".csv"):
+                filename = channel + ".csv"    
+            else:
+                filename = channel
+            df = pd.read_csv(filename)
+            users[channel] = df.username.unique()
+        
+        matrix = pd.DataFrame(columns = users.keys(), index = users.keys())
+        
+        for chan in users.keys():
+            for chan2 in users.keys():
+                if chan == chan2:
+                    pass
+                else:
+                    value = 0
+                    for name in users[chan]:
+                        if name in users[chan2]:
+                            value += 1
+                            
+                        if not weighted and value > 0:
+                            value = 1
+                    matrix[chan].loc[chan2] = value
+        if matrix_name != None:
+            if not matrix_name.endswith(".csv"):
+                matrix_name = matrix_name + ".csv"
+            matrix.to_csv(matrix_name)
+        else:
+            matrix.to_csv("twitch_association_matrix.csv")
+                    
+        
