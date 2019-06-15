@@ -71,7 +71,6 @@ class connect_twitch(socket):
         while (time() - startTime) < duration: 
             now = time() # Track loop time for adaptive rate limiting
             ready_socks,_,_ = select.select(self._sockets.values(), [], [], 1)
-            
             for channel in self.joined:
                 sock = self._sockets[channel]
                 if sock in ready_socks:
@@ -89,11 +88,10 @@ class connect_twitch(socket):
                     elapsed = time() - now
                     if elapsed < 60/800:
                         sleep( (60/800) - elapsed) # Rate limit
-                else: # if not in ready socks
+                else: # if not in ready_socks
                     pass
         if debug:
             print("Collected for " + str(time()-startTime) + " seconds")
-            
         # Close sockets once not collecting data
         for channel in self.joined:
             self._sockets[channel].close()
@@ -137,7 +135,8 @@ class connect_twitch(socket):
             except:
                 print("Please either connect to channels, \
                       or specify a list of log files to parse.")
-
+                
+        # Retrieve data from logs
         for channel in channels:
             if not channel.endswith(".log"):
                 filename = channel + ".log"
@@ -206,6 +205,7 @@ class connect_twitch(socket):
                         
     def assoc_matrix(self, channels = [], weighted = True, matrix_name = None, 
                      ignore_bots = True):
+        
         """
         Generates an association matrix between streamers, where a tie indicates
         that one (or more) users commented in the chats of both streamers.
@@ -235,6 +235,7 @@ class connect_twitch(socket):
                 print("Please either connect to channels, \
                       or specify a list of csv files to analyse.")
         
+        # Get unique users in each stramer's chat
         users = {}
         for channel in channels:
             if not channel.endswith(".csv"):
@@ -249,6 +250,7 @@ class connect_twitch(socket):
         
         matrix = pd.DataFrame(columns = users.keys(), index = users.keys())
         
+        # Finding ties in the network
         for chan in users.keys():
             for chan2 in users.keys():
                 if chan == chan2 :
@@ -257,12 +259,13 @@ class connect_twitch(socket):
                     value = 0
                     for name in users[chan]:
                         if name in users[chan2]:
-                            if not ignore_bots or name not in self.botlist:
+                            if not ignore_bots or name not in self.bot_list:
                                 value += 1
                     if not weighted and value > 0:
                         value = 1
                     matrix[chan].loc[chan2] = value
                     
+        # Naming the matrix 
         if matrix_name != None:
             if not matrix_name.endswith(".csv"):
                 matrix_name = matrix_name + ".csv"
