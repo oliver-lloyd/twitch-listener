@@ -228,9 +228,9 @@ class connect_twitch(socket):
                 filename = channel
             try:    
                 df = pd.read_csv(filename)
+                users[channel] = df.username.unique()
             except:
                 print("Couldn't find %s" % filename)
-            users[channel] = df.username.unique()
         
         matrix = pd.DataFrame(columns = users.keys(), index = users.keys())
         
