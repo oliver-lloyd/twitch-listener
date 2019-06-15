@@ -5,8 +5,7 @@ from twitch_listener import utils
 import select
 
 class connect_twitch(socket):
-     
-
+    
     def __init__(self, nickname, oauth, client_id):
 
         self.nickname = nickname
@@ -16,6 +15,12 @@ class connect_twitch(socket):
             self.oauth = oauth
         else:
             self.oauth = 'oauth:' + oauth
+        self.botlist = ['moobot' 'nightbot', 'ohbot',
+                        'deepbot', 'ankhbot', 'vivbot',
+                        'wizebot', 'coebot', 'phantombot',
+                        'xanbot', 'hnlbot', 'streamlabs',
+                        'stay_hydrated_bot', 'botismo', 'streamelements',
+                        'slanderbot', 'fossabot']
             
         # IRC parameters
         self._server = "irc.chat.twitch.tv"
@@ -43,7 +48,7 @@ class connect_twitch(socket):
             
             self.joined.append(channel)
         
-    def listen(self, channels, duration = 0, debug = False):
+    def listen(self, channels, duration, debug = False):
 
         """
         Method for scraping chat data from Twitch channels.
@@ -53,8 +58,8 @@ class connect_twitch(socket):
                 - Channel(s) to connect to.
             duration (int)           
                  - Length of time to listen for.
-            debug (bool)             
-                 - Debugging feature, will likely be removed in later version. 
+            debug (bool, optional)             
+                 - Debugging feature, will likely be removed in later version.
         """
 
         if type(channels) is str:
@@ -106,7 +111,7 @@ class connect_twitch(socket):
             
         return splits
 
-    def parse_logs(self, channels = [], timestamp = True):
+    def parse_logs(self, channels = [], timestamp = True, remove_bots = False):
 
         """
         Method for converting raw data from text logs into .CSV format.
@@ -121,6 +126,8 @@ class connect_twitch(socket):
                     will be parsed into csv format.
                 - If none are specified, the channels that are 
                     currently joined will be parsed
+            remove_bots (bool, optional)
+                - Whether or not to exclude messages sent by common bot accounts
         """
 
         # Check if specific list of channels is given
@@ -188,13 +195,17 @@ class connect_twitch(socket):
                     row['timestamp'] = datetime
             
                 # Store observations
-                data.append(row)
+                if remove_bots and row['username'] in self.botlist:
+                    pass
+                else:
+                    data.append(row)
             
             # Write data to file
             if len(data) > 0:
                 pd.DataFrame(data).to_csv(channel + ".csv", index = False)
                         
-    def assoc_matrix(self, channels = [], weighted = True, matrix_name = None):
+    def assoc_matrix(self, channels = [], weighted = True, matrix_name = None, 
+                     ignore_bots = True):
         """
         Generates an association matrix between streamers, where a tie indicates
         that one (or more) users commented in the chats of both streamers.
@@ -210,7 +221,10 @@ class connect_twitch(socket):
                 - Indicate whether ties should be weighted by the number of 
                 common users, or simply be binary.
             filename (string, optional)
-                - Name to give the association matrix .CSV file
+                - Name to give the association matrix .CSV file.
+            ignore_bots (boolean, optional)
+                - Whether or not to ignore bots when finding ties between 
+                streamers.
         """
         
         # Check if specific list of channels is given
@@ -220,6 +234,7 @@ class connect_twitch(socket):
             except:
                 print("Please either connect to channels, \
                       or specify a list of csv files to analyse.")
+        
         users = {}
         for channel in channels:
             if not channel.endswith(".csv"):
@@ -234,16 +249,16 @@ class connect_twitch(socket):
         
         matrix = pd.DataFrame(columns = users.keys(), index = users.keys())
         
-
         for chan in users.keys():
             for chan2 in users.keys():
-                if chan == chan2:
+                if chan == chan2 :
                     pass
                 else:
                     value = 0
                     for name in users[chan]:
                         if name in users[chan2]:
-                            value += 1  
+                            if not ignore_bots or name not in self.bot_list:
+                                value += 1
                     if not weighted and value > 0:
                         value = 1
                     matrix[chan].loc[chan2] = value
@@ -254,4 +269,5 @@ class connect_twitch(socket):
             matrix.to_csv(matrix_name)
         else:
             matrix.to_csv("twitch_association_matrix.csv")
+
         
