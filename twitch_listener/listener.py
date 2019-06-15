@@ -257,7 +257,7 @@ class connect_twitch(socket):
                     value = 0
                     for name in users[chan]:
                         if name in users[chan2]:
-                            if not ignore_bots or name not in self.bot_list:
+                            if not ignore_bots or name not in self.botlist:
                                 value += 1
                     if not weighted and value > 0:
                         value = 1
