@@ -9,7 +9,7 @@ setup(
   author_email = 'ollielloyd96@outlook.com',      # Type in your E-Mail
   url = 'https://github.com/lloyd334/twitch-listener',   # Provide either the link to your github or to your website
   download_url = 'https://github.com/lloyd334/twitch-listener/archive/1.1.0.tar.gz',    # I explain this later on
-  keywords = ['Twitch', 'twitch.tv', 'chatbot', 'chat', 'bot', 'scraper', 'scraping'],   # Keywords that define your package best
+  keywords = ['Twitch', 'twitch.tv', 'chatbot', 'chat', 'bot', 'scraper', 'scraping', 'scrape', 'network', 'analysis', 'streamer'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
           'pandas',
           'requests'

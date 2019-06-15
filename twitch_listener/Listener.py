@@ -132,7 +132,7 @@ class connect_twitch(socket):
                       or specify a list of log files to parse.")
 
         for channel in channels:
-            if not filename.endswith(".log"):
+            if not channel.endswith(".log"):
                 filename = channel + ".log"
             lines = []
             with open(filename) as f:
@@ -198,6 +198,9 @@ class connect_twitch(socket):
         """
         Generates an association matrix between streamers, where a tie indicates
         that one (or more) users commented in the chats of both streamers.
+        Note: on average, the time taken to create the matrix will increase 
+        with the square of the number of chat logs being analysed. Larger
+        numbers of logs can take long periods of time to generate a matrix from.
         
         Parameters:
             channels (list, optional)
@@ -223,11 +226,15 @@ class connect_twitch(socket):
                 filename = channel + ".csv"    
             else:
                 filename = channel
-            df = pd.read_csv(filename)
+            try:    
+                df = pd.read_csv(filename)
+            except:
+                print("Couldn't find %s" % filename)
             users[channel] = df.username.unique()
         
         matrix = pd.DataFrame(columns = users.keys(), index = users.keys())
         
+
         for chan in users.keys():
             for chan2 in users.keys():
                 if chan == chan2:
@@ -236,16 +243,15 @@ class connect_twitch(socket):
                     value = 0
                     for name in users[chan]:
                         if name in users[chan2]:
-                            value += 1
-                            
-                        if not weighted and value > 0:
-                            value = 1
+                            value += 1  
+                    if not weighted and value > 0:
+                        value = 1
                     matrix[chan].loc[chan2] = value
+                    
         if matrix_name != None:
             if not matrix_name.endswith(".csv"):
                 matrix_name = matrix_name + ".csv"
             matrix.to_csv(matrix_name)
         else:
             matrix.to_csv("twitch_association_matrix.csv")
-                    
         
