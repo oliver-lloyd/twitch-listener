@@ -22,10 +22,10 @@ Store these values securely. You now have everything you need to use TwitchListe
 # Example usage:
 
 ```python
-from twitch_listener import Listener
+from twitch_listener import listener
 
 # Connect to Twitch
-bot = Listener.connect_twitch('yourUsernameHere', 
+bot = listener.connect_twitch('yourUsernameHere', 
                              'yourOauthHere', 
                              'yourClientIDHere')
 
@@ -38,8 +38,8 @@ bot.listen(channels_to_listen_to, duration = 1800)
 # Convert log files into .CSV format
 bot.parse_logs(timestamp = True)
 
-# Generate association matrix
-bot.assoc_matrix(weighted = False, matrix_name = "streamer_network.csv")
+# Generate adjacency matrix
+bot.adj_matrix(weighted = False, matrix_name = "streamer_network.csv")
 ```
 
 

@@ -203,11 +203,11 @@ class connect_twitch(socket):
             if len(data) > 0:
                 pd.DataFrame(data).to_csv(channel + ".csv", index = False)
                         
-    def assoc_matrix(self, channels = [], weighted = True, matrix_name = None, 
+    def adj_matrix(self, channels = [], weighted = True, matrix_name = None, 
                      ignore_bots = True):
         
         """
-        Generates an association matrix between streamers, where a tie indicates
+        Generates an adjacency matrix between streamers, where a tie indicates
         that one (or more) users commented in the chats of both streamers.
         Note: on average, the time taken to create the matrix will increase 
         with the square of the number of chat logs being analysed. Larger
