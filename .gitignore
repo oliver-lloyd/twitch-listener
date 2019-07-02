@@ -1,3 +1,7 @@
 testing.py
 *.log
+*.csv
+*.txt
 /__pycache__
+/.vscode
+twitch_listener/__pycache__

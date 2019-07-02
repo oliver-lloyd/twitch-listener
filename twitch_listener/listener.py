@@ -3,6 +3,8 @@ from socket import socket
 from time import time, sleep
 from twitch_listener import utils
 import select
+import re
+import codecs
 
 class connect_twitch(socket):
     
@@ -136,10 +138,9 @@ class connect_twitch(socket):
                 print("Please either connect to channels, \
                       or specify a list of log files to parse.")
                 
-        # Retrieve data from logs
-        import re
-        import codecs
-
+        
+        
+        # Set up regex for hex decoding
         ESCAPE_SEQUENCE_RE = re.compile(r'''
             ( \\U........      # 8-digit hex escapes
             | \\u....          # 4-digit hex escapes
@@ -155,10 +156,11 @@ class connect_twitch(socket):
         
             return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
         
-        # Check if string given
+        # Check if string given for channe;s
         if type(channels) == str:
             channels = [channels]
             
+        # Retrieve data from logs
         for channel in channels:
             if not channel.endswith(".log"):
                 filename = channel + ".log"
