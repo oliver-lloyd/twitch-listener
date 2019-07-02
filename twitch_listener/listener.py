@@ -137,6 +137,28 @@ class connect_twitch(socket):
                       or specify a list of log files to parse.")
                 
         # Retrieve data from logs
+        import re
+        import codecs
+
+        ESCAPE_SEQUENCE_RE = re.compile(r'''
+            ( \\U........      # 8-digit hex escapes
+            | \\u....          # 4-digit hex escapes
+            | \\x..            # 2-digit hex escapes
+            | \\[0-7]{1,3}     # Octal escapes
+            | \\N\{[^}]+\}     # Unicode characters by name
+            | \\[\\'"abfnrtv]  # Single-character escapes
+            )''', re.UNICODE | re.VERBOSE)
+        
+        def decode_escapes(s):
+            def decode_match(match):
+                return codecs.decode(match.group(0), 'unicode-escape')
+        
+            return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
+        
+        # Check if string given
+        if type(channels) == str:
+            channels = [channels]
+            
         for channel in channels:
             if not channel.endswith(".log"):
                 filename = channel + ".log"
@@ -167,7 +189,7 @@ class connect_twitch(socket):
             
             # Parse username, message text and (optional) datetime
             data = []          
-            for ind, message in enumerate(split_messages):
+            for message in split_messages:
                 username = None
                 message_text = None
                 datetime = None
@@ -179,7 +201,8 @@ class connect_twitch(socket):
                 
                 slice_point = slice_.find(":") + 1
                 message_text = slice_[slice_point:]
-                row['text'] = message_text
+                decoded_txt = decode_escapes(message_text).encode('latin1').decode('utf-8')
+                row['text'] = decoded_txt
                 
                 # Parse username
                 b = message.find("b")
