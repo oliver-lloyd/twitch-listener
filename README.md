@@ -32,7 +32,7 @@ bot = listener.connect_twitch('yourUsernameHere',
 # List of channels to connect to
 channels_to_listen_to = ['Northernlion', 'DumbDog', 'DanGheesling']
 
-# Scrape chat data into raw log files. (Duration is seconds)
+# Scrape live chat data into raw log files. (Duration is seconds)
 bot.listen(channels_to_listen_to, duration = 1800) 
 
 # Convert log files into .CSV format
