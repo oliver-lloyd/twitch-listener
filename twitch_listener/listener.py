@@ -27,8 +27,8 @@ class connect_twitch(socket):
         # IRC parameters
         self._server = "irc.chat.twitch.tv"
         self._port = 6667
-        self._passString = f"PASS " + oauth + f"\n"
-        self._nameString = f"NICK " + nickname + f"\n"
+        self._passString = f"PASS " + self.oauth + f"\n"
+        self._nameString = f"NICK " + self.nickname + f"\n"
         
 
     def _join_channels(self, channels):
