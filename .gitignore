@@ -4,4 +4,5 @@ testing.py
 *.txt
 /__pycache__
 /.vscode
-twitch_listener/__pycache__
+twitch_chat_recorder/__pycache__
+/venv/
