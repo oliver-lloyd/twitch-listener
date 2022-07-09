@@ -2,6 +2,8 @@ from unittest import TestCase
 
 
 class TestTwitchConnector(TestCase):
+    def setUp(self) -> None:
+        print("setup for test")
 
     def test__join_channels(self):
         self.assertEqual(1, 1, "TODO: complete the test")
@@ -17,3 +19,5 @@ class TestTwitchConnector(TestCase):
 
     def test_adj_matrix(self):
         self.assertEqual(1, 1, "TODO: complete the test")
+
+
