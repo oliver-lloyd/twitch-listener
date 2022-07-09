@@ -6,3 +6,4 @@ testing.py
 /.vscode
 twitch_chat_recorder/__pycache__
 /venv/
+.idea/sonarlint/
