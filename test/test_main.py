@@ -1,9 +1,5 @@
 import unittest
-
-
-class MyTestCase(unittest.TestCase):
-    def test_something(self):
-        self.assertEqual(True, True)  # add assertion here
+from test_twitchIRCConnector import TestTwitchConnector
 
 
 if __name__ == '__main__':
