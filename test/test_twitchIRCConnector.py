@@ -24,7 +24,7 @@ class TestTwitchConnector(unittest.TestCase):
         self.oauth = '83rip6j6fgio8n5xly1oum1lph8ikl1'  # FAKE oauth: DON'T publish a real ONE
         connector_tw = TwitchConnector(self.nickname, self.oauth)
         self.assertEqual('learndatasci2', connector_tw.nickname)  # add assertion here
-        self.assertEqual('oauth:83rip6j6fgio8n5xly1oum1lph8ikl1', connector_tw.oauth)  # add assertion here
+        self.assertEqual('83rip6j6fgio8n5xly1oum1lph8ikl1', connector_tw.oauth)  # add assertion here
 
         # VERIFY the server address and the port
         self.assertEqual('irc.chat.twitch.tv', connector_tw._server)
@@ -89,7 +89,7 @@ class TestTwitchChatterbox(unittest.TestCase):
 
     def test_send_PRIVMSG(self):
         message = "private message"
-        input_string = f'PRIVMSG {message}\n'.encode('utf-8')
+        input_string = f'PRIVMSG #{self.channel_name} :{message} \n'.encode('utf-8')
         self.chatter.send_PRIVMSG(message)
         self.chatter.send.assert_called_with(input_string)
 
