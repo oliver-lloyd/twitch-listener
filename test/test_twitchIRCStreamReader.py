@@ -35,5 +35,3 @@ class TestTwitchIRCStreamReader(unittest.TestCase):
         for streamReader in list_stream_reader:
             q = streamReader.get_rx_queue()
             self.assertIsNotNone(q)
-            for el_index in range(q.qsize()):
-                print(q.get())
