@@ -1,3 +1,2 @@
 from twitch_chat_recorder.twitchIRCConnector import TwitchConnector, TwitchChatterbox
-from twitch_chat_recorder.twitchIRCStreamReader import TwitchIRCStreamReader
 from twitch_chat_recorder import utils
