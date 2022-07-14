@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, Mock
-from twitch_chat_recorder.twitchIRCConnector import TwitchConnector, TwitchChatterbox
+from twitch_chat_recorder import *
 
 
 class TestTwitchConnector(unittest.TestCase):
@@ -64,7 +64,7 @@ class TestTwitchChatterbox(unittest.TestCase):
         def mockSocketRecv(self, recv_mock):
             self.return_value = recv_mock
 
-        self.chatter = TwitchChatterbox(self._server, self._port,self.userName, self.password, self.channel_name)
+        self.chatter = TwitchChatterbox(self._server, self._port, self.userName, self.password, self.channel_name)
         self.chatter.send = Mock(return_value=None)
         self.chatter.recv = Mock(return_value=None)
         self.chatter.recv.return_value = ""
