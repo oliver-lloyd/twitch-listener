@@ -5,6 +5,7 @@ name: Python package
 
 on:
   push:
+    paths: ["test/**","twitch_chat_recorder/**"]
     branches: [ "develop" ]
   pull_request:
     branches: [ "develop" ]
