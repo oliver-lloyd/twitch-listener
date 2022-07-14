@@ -4,85 +4,81 @@ from socket import socket, AddressFamily, SocketKind
 class TwitchConnector:
     def __init__(self, nickname, oauth):
         self.nickname = nickname
-
-        if oauth.startswith('oauth:'):
-            self.oauth = oauth
-        else:
-            self.oauth = 'oauth:' + oauth
+        self.oauth = oauth
 
         # IRC parameters
         self._server = 'irc.chat.twitch.tv'
         self._port = 6667
 
-        self._passString = f"PASS " + self.oauth + f"\n"
-        self._nameString = f"NICK " + self.nickname + f"\n"
+        self.list_chatter_boxs = []
 
     def create_dictionary_channel_socket(self, channels):
         _sockets = {}
         # Establish socket connections
         for channel in channels:
-            _sockets[channel] = TwitchChatterbox()
+            _sockets[channel] = TwitchChatterbox(self._server, self._port, self.nickname, self.oauth, channel)
 
         return _sockets
 
     def connect_channels(self, channels):
-        sock_list = self.create_dictionary_channel_socket(channels)
+        chatter_boxes = self.create_dictionary_channel_socket(channels)
 
-        for channel, sock in sock_list.items():
-            sock.connect((self._server, self._port))
-            sock.send(self._passString.encode('utf-8'))
-            sock.send(self._nameString.encode('utf-8'))
-            join_string = f"JOIN #" + channel + f"\n"
-            sock.send(join_string.encode('utf-8'))
-            self.is_successful_authenticated(sock)
+        for channel, chatterbox in chatter_boxes.items():
+            self.list_chatter_boxs.append(chatterbox)
 
-
-    @staticmethod
-    def is_successful_authenticated(chatter_sock):
-        auth_twitch_response = chatter_sock.read()
-        if 'tmi.twitch.tv NOTICE' in str(auth_twitch_response) and \
-                'failed' not in str(auth_twitch_response):
-            chatter_sock.isAuthenticated = True
-            print(chatter_sock.channel_name, " is connected\n")
+    def get_list_chatter_boxs(self):
+        return self.list_chatter_boxs
 
 
 class TwitchChatterbox(socket):
-    def __init__(self):
+    def __init__(self, server, port, nickname, oauth, channel):
+        self._server = server
+        self._port = port
+        self.nickname = nickname
+        self.channel_name = channel
+        if oauth.startswith('oauth:'):
+            self.oauth = oauth
+        else:
+            self.oauth = 'oauth:' + oauth
+        self._passString = f"PASS " + self.oauth + f"\n"
+        self._nameString = f"NICK " + self.nickname + f"\n"
         socket.__init__(self, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM)
-        self.settimeout(2.0)
-        self.family
+        self.connect((self._server, self._port))
+        self.send(self._passString.encode('utf-8'))
+        self.send(self._nameString.encode('utf-8'))
+        join_string = f"JOIN #" + channel.lower() + f"\n"
+        self.send(join_string.encode('utf-8'))
+
+        #self.settimeout(5.0)
         self.isAuthenticated = False
-        self.name = ''
-        self.password = ''
-        self.channel_name = ''
 
     def __del__(self):
         self.close()
 
     def set_name(self, name):
-        self.name = name
+        self.nickname = name
 
     def set_password(self, password):
-        self.password = password
+        self.oauth = password
 
     def set_channel_name(self, channel_name):
         self.channel_name = channel_name
 
     def send_PRIVMSG(self, post_chat_message):
-        self.send(f'PRIVMSG '+post_chat_message+f"\n")
+        print(f"PRIVMSG #{self.channel_name} :{post_chat_message} \n")
+        self.send(f"PRIVMSG #{self.channel_name} :{post_chat_message} \n".encode('utf-8'))
 
     def send_NICK(self):
-        self.send(f'NICK {self.name}\n')
-        #self.send(b'1')
+        self.send(f'NICK {self.nickname}\n'.encode('utf-8'))
 
     def send_PASS(self):
-        self.send(f"PASS " + self.password + f"\n")
+        self.send(f"PASS {self.oauth}\n".encode('utf-8'))
 
     def send_PONG(self, text_from_ping):
-        self.send(f'PONG ' + text_from_ping + f"\n")
+        self.send(f'PONG {text_from_ping}\n'.encode('utf-8'))
 
     def send_JOIN(self):
-        self.send(f'JOIN #'+self.channel_name + f"\n")
+        self.send(f'JOIN #{self.channel_name }\n'.encode('utf-8'))
 
     def read(self):
         read_msg = ''
@@ -93,3 +89,6 @@ class TwitchChatterbox(socket):
         except ConnectionResetError:
             print("An existing connection was forcibly closed by the remote host")
         return read_msg
+
+    def is_authenticated(self):
+        return self.isAuthenticated
