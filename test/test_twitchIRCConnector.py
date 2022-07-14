@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch, Mock
-import twitch_chat_recorder.twitchIRCConnector
-import twitch_chat_recorder.twitchIRCConnector
+from twitch_chat_recorder import *
 
 
 class TestTwitchConnector(unittest.TestCase):
