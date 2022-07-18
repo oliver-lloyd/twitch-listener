@@ -40,4 +40,4 @@ jobs:
     - name: Test 
       run: |
         cd $GITHUB_WORKSPACE
-        python  -m unittest test/test_main.py
+        python  -m unittest twitch_chat_recorder/test/test_main.py
