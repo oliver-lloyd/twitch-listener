@@ -1,3 +1,3 @@
 from test_main import *
 from test_twitchIRCConnector import *
-from twitch_chat_recorder.twitchIRCConnector import *
+from test_twitchIRCStreamReader import *
