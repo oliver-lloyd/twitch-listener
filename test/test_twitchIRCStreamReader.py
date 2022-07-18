@@ -1,5 +1,8 @@
 import time
 import unittest
+
+import sys
+sys.path.append('/home/runner/work/twitch-chat-recorder/')
 from twitch_chat_recorder.twitchIRCConnector import TwitchConnector
 from twitch_chat_recorder.twitchIRCStreamReader import TwitchIRCStreamReader
 
