@@ -1,6 +1,7 @@
 import time
 import unittest
 from twitch_chat_recorder.twitchIRCConnector import *
+from twitch_chat_recorder.twitchIRCStreamReader import *
 
 
 class TestTwitchIRCStreamReader(unittest.TestCase):
