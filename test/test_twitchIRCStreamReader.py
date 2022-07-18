@@ -1,10 +1,6 @@
 import time
 import unittest
-
-import sys
-sys.path.append('../../')
-from twitch_chat_recorder.twitchIRCConnector import TwitchConnector
-from twitch_chat_recorder.twitchIRCStreamReader import TwitchIRCStreamReader
+from twitch_chat_recorder.twitchIRCConnector import *
 
 
 class TestTwitchIRCStreamReader(unittest.TestCase):
