@@ -40,5 +40,6 @@ jobs:
     - name: Test 
       run: |
         cd $GITHUB_WORKSPACE
+        python import sys
         python sys.path
         python test/test_main.py -m /home/runner/work/twitch-chat-recorder/twitch-chat-recorder/
