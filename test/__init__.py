@@ -1,5 +1,5 @@
-from test_twitchIRCConnector import TestTwitchConnector, TestTwitchChatterbox
-from test_twitchIRCStreamReader import TestTwitchIRCStreamReader
+from test.test_twitchIRCConnector import TestTwitchConnector, TestTwitchChatterbox
+from test.test_twitchIRCStreamReader import TestTwitchIRCStreamReader
 from .twitch_chat_recorder.twitchIRCConnector import TwitchConnector, TwitchChatterbox
 from .twitch_chat_recorder.twitchIRCController import TwitchIRCController
 from .twitch_chat_recorder.twitchIRCStreamReader import TwitchIRCStreamReader
