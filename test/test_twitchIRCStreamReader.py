@@ -13,7 +13,7 @@ class TestTwitchIRCStreamReader(unittest.TestCase):
         self.connector_tw.connect_channels(self.channel_name)
 
     def test_init(self):
-        list_chatter_boxes = self.connector_tw.get_list_chatter_boxs()
+        list_chatter_boxes = self.connector_tw.get_list_chatter_boxes()
         list_stream_reader = []
         index = 0
         for chatterBox in list_chatter_boxes:

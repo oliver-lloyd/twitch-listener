@@ -75,30 +75,30 @@ class TestTwitchChatterbox(unittest.TestCase):
         self.chatter.set_channel_name(self.channel_name)
 
     def test_send_NICK(self):
-        input_string = f'NICK {self.userName}\n'.encode('utf-8')
-        self.chatter.send_NICK()
+        input_string = f'NICK {self.userName}\r\n'.encode('utf-8')
+        self.chatter.send_nick()
         self.chatter.send.assert_called_with(input_string)
 
     def test_send_PASS(self):
-        input_string = f'PASS {self.password}\n'.encode('utf-8')
-        self.chatter.send_PASS()
+        input_string = f'PASS {self.password}\r\n'.encode('utf-8')
+        self.chatter.send_pass()
         self.chatter.send.assert_called_with(input_string)
 
     def test_send_JOIN(self):
-        input_string = f'JOIN #{self.channel_name}\n'.encode('utf-8')
-        self.chatter.send_JOIN()
+        input_string = f'JOIN #{self.channel_name}\r\n'.encode('utf-8')
+        self.chatter.send_join()
         self.chatter.send.assert_called_with(input_string)
 
     def test_send_PRIVMSG(self):
         message = "private message"
-        input_string = f'PRIVMSG #{self.channel_name} :{message} \n'.encode('utf-8')
-        self.chatter.send_PRIVMSG(message)
+        input_string = f'PRIVMSG #{self.channel_name} :{message} \r\n'.encode('utf-8')
+        self.chatter.send_privmsg(message)
         self.chatter.send.assert_called_with(input_string)
 
     def test_send_PONG(self):
         test_message = "test"
-        input_string = f'PONG {test_message}\n'.encode('utf-8')
-        self.chatter.send_PONG(test_message)
+        input_string = f'PONG {test_message}\r\n'.encode('utf-8')
+        self.chatter.send_pong(test_message)
         self.chatter.send.assert_called_with(input_string)
 
     def test_read(self):

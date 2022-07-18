@@ -26,7 +26,7 @@ class TwitchConnector:
         for channel, chatterbox in chatter_boxes.items():
             self.list_chatter_boxs.append(chatterbox)
 
-    def get_list_chatter_boxs(self):
+    def get_list_chatter_boxes(self):
         return self.list_chatter_boxs
 
 
@@ -40,16 +40,15 @@ class TwitchChatterbox(socket):
             self.oauth = oauth
         else:
             self.oauth = 'oauth:' + oauth
-        self._passString = f"PASS " + self.oauth + f"\n"
-        self._nameString = f"NICK " + self.nickname + f"\n"
+        self._passString = f"PASS " + self.oauth + f"\r\n"
+        self._nameString = f"NICK " + self.nickname + f"\r\n"
         socket.__init__(self, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM)
         self.connect((self._server, self._port))
         self.send(self._passString.encode('utf-8'))
         self.send(self._nameString.encode('utf-8'))
-        join_string = f"JOIN #" + channel.lower() + f"\n"
+        join_string = f"JOIN #" + channel.lower() + f"\r\n"
         self.send(join_string.encode('utf-8'))
 
-        #self.settimeout(5.0)
         self.isAuthenticated = False
 
     def __del__(self):
@@ -64,21 +63,20 @@ class TwitchChatterbox(socket):
     def set_channel_name(self, channel_name):
         self.channel_name = channel_name
 
-    def send_PRIVMSG(self, post_chat_message):
-        print(f"PRIVMSG #{self.channel_name} :{post_chat_message} \n")
-        self.send(f"PRIVMSG #{self.channel_name} :{post_chat_message} \n".encode('utf-8'))
+    def send_privmsg(self, post_chat_message):
+        self.send(f"PRIVMSG #{self.channel_name} :{post_chat_message} \r\n".encode('utf-8'))
 
-    def send_NICK(self):
-        self.send(f'NICK {self.nickname}\n'.encode('utf-8'))
+    def send_nick(self):
+        self.send(f'NICK {self.nickname}\r\n'.encode('utf-8'))
 
-    def send_PASS(self):
-        self.send(f"PASS {self.oauth}\n".encode('utf-8'))
+    def send_pass(self):
+        self.send(f"PASS {self.oauth}\r\n".encode('utf-8'))
 
-    def send_PONG(self, text_from_ping):
-        self.send(f'PONG {text_from_ping}\n'.encode('utf-8'))
+    def send_pong(self, text_from_ping):
+        self.send(f'PONG {text_from_ping}\r\n'.encode('utf-8'))
 
-    def send_JOIN(self):
-        self.send(f'JOIN #{self.channel_name }\n'.encode('utf-8'))
+    def send_join(self):
+        self.send(f'JOIN #{self.channel_name }\r\n'.encode('utf-8'))
 
     def read(self):
         read_msg = ''
