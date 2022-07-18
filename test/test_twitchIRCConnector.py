@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 import sys
-sys.path.append("../")
+sys.path.append('/home/runner/work/twitch-chat-recorder/')
 from twitch_chat_recorder.twitchIRCConnector import *
 
 
