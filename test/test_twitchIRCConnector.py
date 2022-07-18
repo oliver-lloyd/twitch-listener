@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 import sys
 sys.path.append('../../')
-from twitch_chat_recorder.twitchIRCConnector import *
+from ...twitch_chat_recorder.twitchIRCConnector import *
 
 
 class TestTwitchConnector(unittest.TestCase):
